@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zainab Imran — AI Automation Systems</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0f1216;
+    --ink-2:#171b21;
+    --ink-3:#1f242c;
+    --line:#2a313c;
+    --line-bright:#3a4452;
+    --paper:#ece6d8;
+    --paper-dim:#a9a293;
+    --muted:#767d8c;
+    --signal:#3fbfae;
+    --signal-bright:#5cd4c4;
+    --signal-glow:rgba(63,191,174,0.35);
+    --warm:#d98c4a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'Inter',sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    overflow-x:hidden;
+    cursor:default;
+  }
+  a{color:inherit;text-decoration:none;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 28px;position:relative;z-index:3;}
+
+  /* ambient moving glow field */
+  .glow-field{
+    position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(600px circle at var(--mx,20%) var(--my,10%), rgba(63,191,174,0.10), transparent 60%),
+      radial-gradient(500px circle at 85% 70%, rgba(217,140,74,0.06), transparent 55%);
+    transition:background 0.3s ease;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;z-index:1;pointer-events:none;
+    background-image:radial-gradient(rgba(255,255,255,0.028) 1px, transparent 1px);
+    background-size:3px 3px;
+  }
+
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(15,18,22,0.78);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);
+  }
+  header .wrap{display:flex;justify-content:space-between;align-items:center;padding:20px 28px;}
+  .brand{font-family:'Fraunces',serif;font-size:1.15rem;font-weight:600;letter-spacing:0.01em;}
+  .brand span{color:var(--signal);}
+  nav{display:flex;gap:34px;font-size:0.88rem;color:var(--paper-dim);align-items:center;}
+  nav a{position:relative;padding:4px 0;}
+  nav a::after{
+    content:"";position:absolute;bottom:0;left:0;width:0%;height:1px;
+    background:var(--signal);transition:width 0.25s ease;
+  }
+  nav a:hover{color:var(--paper);}
+  nav a:hover::after{width:100%;}
+  .status-pill{
+    display:flex;align-items:center;gap:8px;
+    font-family:'IBM Plex Mono',monospace;font-size:0.72rem;
+    padding:6px 12px;border:1px solid var(--line-bright);border-radius:20px;color:var(--paper-dim);
+  }
+  .status-dot{width:6px;height:6px;border-radius:50%;background:var(--signal);
+    box-shadow:0 0 0 0 rgba(63,191,174,0.6);animation:pulse-ring 2s infinite;}
+  @keyframes pulse-ring{
+    0%{box-shadow:0 0 0 0 rgba(63,191,174,0.55);}
+    70%{box-shadow:0 0 0 7px rgba(63,191,174,0);}
+    100%{box-shadow:0 0 0 0 rgba(63,191,174,0);}
+  }
+
+  /* reveal utility */
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity 0.7s cubic-bezier(.2,.7,.2,1),transform 0.7s cubic-bezier(.2,.7,.2,1);}
+  .reveal.in{opacity:1;transform:translateY(0);}
+
+  /* HERO */
+  .hero{padding:130px 0 100px;position:relative;}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;font-size:0.78rem;letter-spacing:0.14em;
+    text-transform:uppercase;color:var(--signal);margin-bottom:26px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--signal);
+    box-shadow:0 0 0 4px rgba(63,191,174,0.15);}
+  h1{
+    font-family:'Fraunces',serif;font-weight:600;
+    font-size:clamp(2.6rem,6vw,4.6rem);line-height:1.04;letter-spacing:-0.015em;
+    max-width:900px;color:var(--paper);
+  }
+  h1 .accent{
+    font-style:italic;font-weight:300;
+    background:linear-gradient(90deg,var(--signal-bright),var(--warm));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .hero-sub{margin-top:28px;max-width:540px;color:var(--paper-dim);font-size:1.08rem;}
+  .hero-actions{margin-top:40px;display:flex;gap:16px;flex-wrap:wrap;}
+  .btn{
+    padding:14px 28px;border-radius:3px;font-size:0.92rem;font-weight:600;
+    display:inline-flex;align-items:center;gap:8px;
+    transition:all 0.25s cubic-bezier(.2,.8,.2,1);position:relative;overflow:hidden;
+  }
+  .btn-solid{background:var(--signal);color:var(--ink);}
+  .btn-solid:hover{background:var(--signal-bright);transform:translateY(-2px);box-shadow:0 10px 30px -8px var(--signal-glow);}
+  .btn-ghost{border:1px solid var(--line-bright);color:var(--paper-dim);}
+  .btn-ghost:hover{border-color:var(--paper);color:var(--paper);transform:translateY(-2px);}
+
+  .stats-row{display:flex;gap:0;margin-top:64px;border-top:1px solid var(--line);padding-top:32px;flex-wrap:wrap;}
+  .stat{flex:1;min-width:150px;padding-right:24px;}
+  .stat-num{font-family:'Fraunces',serif;font-size:2.1rem;font-weight:600;color:var(--paper);}
+  .stat-num span{color:var(--signal);}
+  .stat-label{font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:var(--muted);
+    text-transform:uppercase;letter-spacing:0.08em;margin-top:6px;}
+
+  /* INTERACTIVE FLOW DEMO */
+  .flow-panel{
+    margin-top:60px;padding:0;background:var(--ink-2);
+    border:1px solid var(--line);border-radius:6px;overflow:hidden;
+  }
+  .flow-panel-head{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:18px 26px;border-bottom:1px solid var(--line);
+  }
+  .flow-label{font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--muted);
+    letter-spacing:0.08em;text-transform:uppercase;}
+  .run-btn{
+    font-family:'IBM Plex Mono',monospace;font-size:0.72rem;
+    color:var(--signal);border:1px solid var(--signal-dim,#2b7f75);padding:7px 16px;
+    border-radius:20px;cursor:pointer;background:transparent;transition:all 0.2s ease;
+    display:flex;align-items:center;gap:8px;
+  }
+  .run-btn:hover{background:rgba(63,191,174,0.1);}
+  .run-btn.running{color:var(--warm);border-color:var(--warm);}
+  .flow-body{padding:40px 34px;overflow-x:auto;}
+  .flow-chain{display:flex;align-items:center;min-width:600px;}
+  .node{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:10px;width:140px;}
+  .node-dot{
+    width:48px;height:48px;border-radius:50%;border:1.5px solid var(--line);
+    background:var(--ink-3);display:flex;align-items:center;justify-content:center;
+    font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:var(--muted);
+    position:relative;z-index:2;transition:all 0.4s ease;
+  }
+  .node-dot.lit{
+    color:var(--ink);background:var(--signal);border-color:var(--signal);
+    box-shadow:0 0 24px 2px var(--signal-glow);
+  }
+  .node-txt{font-size:0.78rem;color:var(--paper-dim);text-align:center;font-family:'IBM Plex Mono',monospace;}
+  .connector{flex:1;height:1.5px;background:var(--line);position:relative;min-width:40px;}
+  .connector .pulse{
+    position:absolute;top:50%;left:0;width:6px;height:6px;margin-top:-3px;
+    border-radius:50%;background:var(--signal);box-shadow:0 0 8px 1px rgba(63,191,174,0.6);
+    opacity:0;
+  }
+  .connector.active .pulse{animation:travel 1.1s ease forwards;}
+  @keyframes travel{0%{left:0;opacity:1;}100%{left:100%;opacity:1;}}
+  .flow-out{
+    padding:16px 26px;border-top:1px solid var(--line);
+    font-family:'IBM Plex Mono',monospace;font-size:0.78rem;color:var(--muted);
+    min-height:44px;display:flex;align-items:center;
+  }
+  .flow-out .ok{color:var(--signal);}
+
+  section{padding:100px 0;position:relative;z-index:2;}
+  .section-head{margin-bottom:60px;max-width:600px;}
+  .section-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:0.75rem;color:var(--muted);
+    letter-spacing:0.12em;text-transform:uppercase;margin-bottom:14px;}
+  h2{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.9rem,3.6vw,2.7rem);color:var(--paper);}
+  .section-desc{margin-top:16px;color:var(--paper-dim);max-width:560px;}
+
+
+  /* SERVICES */
+  .services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;}
+  .service-card{
+    background:var(--ink-2);border:1px solid var(--line);padding:36px 30px;
+    transition:all 0.3s ease;
+  }
+  .service-card:hover{border-color:var(--signal-dim,#2b7f75);transform:translateY(-4px);}
+  .service-num{font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--signal);margin-bottom:42px;}
+  .service-title{font-family:'Fraunces',serif;font-size:1.45rem;font-weight:600;color:var(--paper);margin-bottom:14px;}
+  .service-desc{color:var(--paper-dim);font-size:0.94rem;}
+  @media(max-width:760px){.services-grid{grid-template-columns:1fr;}}
+
+  /* WORK CARDS */
+  .work-grid{display:flex;flex-direction:column;gap:2px;}
+  .card{
+    background:var(--ink-2);border:1px solid var(--line);padding:42px;
+    transition:all 0.35s cubic-bezier(.2,.8,.2,1);position:relative;
+  }
+  .card:hover{border-color:var(--signal-dim,#2b7f75);transform:translateX(6px);}
+  .card::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:2px;
+    background:var(--signal);transform:scaleY(0);transform-origin:top;
+    transition:transform 0.35s ease;
+  }
+  .card:hover::before{transform:scaleY(1);}
+  .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap;margin-bottom:22px;}
+  .card-title{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:600;color:var(--paper);}
+  .card-tags{display:flex;gap:8px;flex-wrap:wrap;}
+  .tag{font-family:'IBM Plex Mono',monospace;font-size:0.68rem;padding:5px 11px;
+    border:1px solid var(--line);color:var(--muted);border-radius:20px;white-space:nowrap;}
+  .card-outcome{color:var(--paper-dim);font-size:1rem;max-width:580px;margin-bottom:28px;}
+  .card-flow{display:flex;align-items:center;gap:0;overflow-x:auto;padding-bottom:4px;}
+  .mini-node{flex-shrink:0;font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--paper-dim);
+    padding:9px 15px;background:var(--ink-3);border:1px solid var(--line);border-radius:20px;white-space:nowrap;
+    transition:all 0.25s ease;}
+  .card:hover .mini-node{border-color:rgba(63,191,174,0.35);color:var(--signal);}
+  .mini-arrow{color:var(--muted);padding:0 10px;flex-shrink:0;font-size:0.85rem;}
+  .card-video{
+    margin-top:26px;padding:15px 18px;background:var(--ink-3);border:1px dashed var(--line);
+    font-family:'IBM Plex Mono',monospace;font-size:0.78rem;color:var(--muted);
+    display:flex;align-items:center;gap:10px;
+  }
+  .card-video::before{content:"▶";color:var(--signal);}
+  a.card-video{color:var(--muted);transition:all 0.2s ease;}
+  a.card-video:hover{border-color:var(--signal-dim,#2b7f75);color:var(--paper);background:var(--ink-2);}
+
+
+  /* CASE STUDY DETAILS */
+  .case-study{
+    margin-top:18px;padding:28px;background:var(--ink-3);
+    border:1px solid var(--line);display:none;
+  }
+  .case-study.open{display:block;animation:caseIn .3s ease;}
+  @keyframes caseIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+  .case-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin:20px 0 26px;}
+  .case-label{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--signal);letter-spacing:.1em;margin-bottom:8px;}
+  .case-copy{color:var(--paper-dim);font-size:.9rem;}
+  .case-flow-full{padding:20px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:24px;color:var(--paper-dim);font-family:'IBM Plex Mono',monospace;font-size:.78rem;line-height:2;}
+  .case-note{font-size:.85rem;color:var(--muted);}
+  .case-actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:22px;}
+  .case-toggle{background:transparent;border:0;color:var(--signal);font:600 .86rem 'Inter',sans-serif;cursor:pointer;padding:0;}
+  .case-toggle:hover{color:var(--signal-bright);}
+  /* PROCESS */
+  .process-grid{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line);}
+  .process-step{padding:30px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--ink-2);}
+  .process-no{font-family:'IBM Plex Mono',monospace;color:var(--signal);font-size:.72rem;margin-bottom:34px;}
+  .process-title{font-family:'Fraunces',serif;font-size:1.3rem;margin-bottom:10px;}
+  .process-desc{color:var(--paper-dim);font-size:.9rem;}
+  /* PRICING */
+  .pricing-note{margin-top:26px;padding:20px 24px;border-left:2px solid var(--signal);background:var(--ink-2);color:var(--paper-dim);font-size:.92rem;}
+  /* CONTACT FORM */
+  .audit-form{max-width:720px;margin:38px auto 0;display:grid;grid-template-columns:1fr 1fr;gap:14px;text-align:left;position:relative;}
+  .audit-form input,.audit-form select,.audit-form textarea{width:100%;padding:14px;border:1px solid var(--line-bright);background:var(--ink-3);color:var(--paper);font:inherit;border-radius:3px;}
+  .audit-form textarea{min-height:120px;resize:vertical;grid-column:1/-1;}
+  .audit-form .full{grid-column:1/-1;}
+  .audit-form button{justify-self:start;border:0;cursor:pointer;}
+  @media(max-width:760px){
+    .case-grid,.process-grid,.audit-form{grid-template-columns:1fr;}
+    .audit-form textarea,.audit-form .full{grid-column:auto;}
+  }
+
+  /* ABOUT */
+  .about-grid{display:grid;grid-template-columns:1.1fr 0.9fr;gap:70px;align-items:start;}
+  .about-text p{color:var(--paper-dim);margin-bottom:20px;font-size:1.02rem;}
+  .about-text strong{color:var(--paper);font-weight:600;}
+  .stack-list{display:flex;flex-direction:column;gap:0;}
+  .stack-row{display:flex;justify-content:space-between;padding:17px 0;border-bottom:1px solid var(--line);
+    font-family:'IBM Plex Mono',monospace;font-size:0.85rem;transition:padding-left 0.25s ease;}
+  .stack-row:hover{padding-left:6px;border-color:var(--line-bright);}
+  .stack-row span:first-child{color:var(--muted);}
+  .stack-row span:last-child{color:var(--paper);}
+
+  /* CONTACT */
+  .contact-inner{
+    background:var(--ink-2);border:1px solid var(--line);padding:80px 50px;text-align:center;
+    position:relative;overflow:hidden;
+  }
+  .contact-inner::before{
+    content:"";position:absolute;inset:-40%;
+    background:radial-gradient(circle,rgba(63,191,174,0.10),transparent 60%);
+    animation:drift 12s ease-in-out infinite;
+  }
+  @keyframes drift{0%,100%{transform:translate(-10%,-10%);}50%{transform:translate(10%,10%);}}
+  .contact-inner h2{margin-bottom:18px;position:relative;}
+  .contact-inner p{color:var(--paper-dim);max-width:460px;margin:0 auto 36px;position:relative;}
+  .contact-links{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;position:relative;}
+
+  footer{border-top:1px solid var(--line);padding:30px 0;font-family:'IBM Plex Mono',monospace;
+    font-size:0.75rem;color:var(--muted);position:relative;z-index:2;}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+
+  @media(max-width:760px){
+    .about-grid{grid-template-columns:1fr;}
+    nav{gap:16px;font-size:0.8rem;}
+    .status-pill{display:none;}
+    .contact-inner{padding:56px 26px;}
+    .stats-row{gap:24px;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .connector .pulse{animation:none !important;opacity:1;left:50%;}
+    .reveal{opacity:1;transform:none;transition:none;}
+    .contact-inner::before{animation:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="glow-field" id="glowField"></div>
+
+<header>
+  <div class="wrap">
+    <div class="brand">Zainab <span>Imran</span></div>
+    <nav>
+      <a href="#services">Services</a>
+      <a href="#work">Work</a>
+      <a href="#process">Process</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+      <div class="status-pill"><span class="status-dot"></span> Open for projects</div>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow reveal">AI Automation Builder • Available for freelance projects</div>
+    <h1 class="reveal">I automate the repetitive work that <span class="accent">slows your business down.</span></h1>
+    <p class="hero-sub reveal">I build practical AI-powered workflows that capture leads, organize information, handle repetitive tasks, and connect the tools your business already uses.</p>
+    <div class="hero-actions reveal">
+      <a href="#work" class="btn btn-solid">View my work →</a>
+      <a href="#contact" class="btn btn-ghost">Get a free automation audit →</a>
+    </div>
+
+    <div class="stats-row reveal">
+      <div class="stat"><div class="stat-num"><span>3</span> systems</div><div class="stat-label">Working automation systems</div></div>
+      <div class="stat"><div class="stat-num">AI <span>+</span> APIs</div><div class="stat-label">Connected into real workflows</div></div>
+      <div class="stat"><div class="stat-num">Remote</div><div class="stat-label">Available for freelance projects</div></div>
+    </div>
+
+    <div class="flow-panel reveal">
+      <div class="flow-panel-head">
+        <div class="flow-label">// live system demo</div>
+        <button class="run-btn" id="runBtn"><span id="runBtnText">▶ Run the workflow</span></button>
+      </div>
+      <div class="flow-body">
+        <div class="flow-chain" id="flowChain">
+          <div class="node"><div class="node-dot" data-node="0">IN</div><div class="node-txt">Trigger</div></div>
+          <div class="connector" data-conn="0"><div class="pulse"></div></div>
+          <div class="node"><div class="node-dot" data-node="1">AI</div><div class="node-txt">Reasoning</div></div>
+          <div class="connector" data-conn="1"><div class="pulse"></div></div>
+          <div class="node"><div class="node-dot" data-node="2">IF</div><div class="node-txt">Decision</div></div>
+          <div class="connector" data-conn="2"><div class="pulse"></div></div>
+          <div class="node"><div class="node-dot" data-node="3">OUT</div><div class="node-txt">Action Taken</div></div>
+        </div>
+      </div>
+      <div class="flow-out mono" id="flowOut">Idle — click "Run the workflow" to watch it fire.</div>
+    </div>
+  </div>
+</section>
+
+
+<section id="services">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">What I automate</div>
+      <h2>Less manual work. Better systems.</h2>
+      <p class="section-desc">I build practical workflows around repetitive processes that take time away from running your business.</p>
+    </div>
+
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <div class="service-num">01 / LEADS</div>
+        <div class="service-title">Lead Automation</div>
+        <p class="service-desc">Capture, organize and follow up with new leads automatically so potential customers don't sit waiting for a response.</p>
+      </div>
+
+      <div class="service-card reveal">
+        <div class="service-num">02 / OPERATIONS</div>
+        <div class="service-title">Workflow Automation</div>
+        <p class="service-desc">Connect the tools you already use and remove repetitive tasks like data entry, notifications, routing and updates.</p>
+      </div>
+
+      <div class="service-card reveal">
+        <div class="service-num">03 / AI</div>
+        <div class="service-title">AI-Powered Workflows</div>
+        <p class="service-desc">Use AI for tasks like classification, extraction, summarization and content generation inside practical business workflows.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="work">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">Featured work</div>
+      <h2>Three business problems, automated.</h2>
+      <p class="section-desc">Working portfolio builds designed around real business processes. Open each project to see the problem, workflow and implementation.</p>
+    </div>
+
+    <div class="work-grid">
+      <article class="card reveal">
+        <div class="card-top">
+          <div class="card-title">Lead Capture &amp; Auto-Follow-up</div>
+          <div class="card-tags"><span class="tag">n8n</span><span class="tag">Google Sheets</span><span class="tag">Gmail</span></div>
+        </div>
+        <p class="card-outcome">A workflow designed to capture a new inquiry, organize the lead and send an immediate follow-up without manually moving information between tools.</p>
+        <div class="card-flow">
+          <div class="mini-node">New inquiry</div><span class="mini-arrow">→</span>
+          <div class="mini-node">Lead logged</div><span class="mini-arrow">→</span>
+          <div class="mini-node">Follow-up sent</div>
+        </div>
+        <div class="case-actions">
+          <button class="case-toggle" data-target="case-lead">View case study ↓</button>
+        </div>
+        <div class="case-study" id="case-lead">
+          <div class="case-grid">
+            <div><div class="case-label">THE PROBLEM</div><p class="case-copy">New inquiries can require manual copying, organizing and responding, which creates delays and opportunities for leads to be missed.</p></div>
+            <div><div class="case-label">THE SOLUTION</div><p class="case-copy">An automated intake flow that receives lead data, stores it in a structured sheet and triggers a personalized first response.</p></div>
+            <div><div class="case-label">WHAT I BUILT</div><p class="case-copy">Webhook intake, data mapping, Google Sheets logging and automated Gmail follow-up inside n8n.</p></div>
+          </div>
+          <div class="case-flow-full">NEW INQUIRY → WEBHOOK → VALIDATE / MAP DATA → GOOGLE SHEETS → PERSONALIZED EMAIL</div>
+          <a href="#contact" class="btn btn-solid">Ask about a similar system →</a>
+          <p class="case-note">Portfolio demonstration built with test data. A production version would be customized around the client's lead source, CRM, email provider and business rules.</p>
+        </div>
+      </article>
+
+      <article class="card reveal">
+        <div class="card-top">
+          <div class="card-title">AI Content Repurposer</div>
+          <div class="card-tags"><span class="tag">n8n</span><span class="tag">Groq AI</span><span class="tag">Google Sheets</span></div>
+        </div>
+        <p class="card-outcome">Turns one source piece of content into platform-specific drafts and saves the outputs in a structured tracker for review.</p>
+        <div class="card-flow">
+          <div class="mini-node">Content submitted</div><span class="mini-arrow">→</span>
+          <div class="mini-node">AI transforms it</div><span class="mini-arrow">→</span>
+          <div class="mini-node">Outputs saved</div>
+        </div>
+        <div class="case-actions">
+          <button class="case-toggle" data-target="case-content">View case study ↓</button>
+          <a href="https://www.loom.com/share/9a05acfa8efa4ccdac00bd7f4b809f91" target="_blank" class="case-toggle">Watch 2 min demo ↗</a>
+        </div>
+        <div class="case-study" id="case-content">
+          <div class="case-grid">
+            <div><div class="case-label">THE PROBLEM</div><p class="case-copy">Repurposing one blog post or transcript into multiple platform formats can become repetitive manual work.</p></div>
+            <div><div class="case-label">THE SOLUTION</div><p class="case-copy">A workflow that takes one source input, generates tailored drafts for multiple platforms and logs them for review.</p></div>
+            <div><div class="case-label">WHAT I BUILT</div><p class="case-copy">n8n orchestration, AI prompting with Groq and structured output storage in Google Sheets.</p></div>
+          </div>
+          <div class="case-flow-full">SOURCE CONTENT → AI ANALYSIS → LINKEDIN / X / INSTAGRAM OUTPUTS → GOOGLE SHEETS TRACKER</div>
+          <a href="https://www.loom.com/share/9a05acfa8efa4ccdac00bd7f4b809f91" target="_blank" class="btn btn-ghost">Watch the full demo ↗</a>
+          <p class="case-note">Portfolio demonstration. A client version could be customized for brand voice, approval steps, content formats and publishing workflows.</p>
+        </div>
+      </article>
+
+      <article class="card reveal">
+        <div class="card-top">
+          <div class="card-title">AI Support Ticket Categorizer</div>
+          <div class="card-tags"><span class="tag">n8n</span><span class="tag">Groq AI</span><span class="tag">Conditional Routing</span></div>
+        </div>
+        <p class="card-outcome">Classifies incoming support requests by category and urgency so repetitive triage can happen before a human begins sorting the queue.</p>
+        <div class="card-flow">
+          <div class="mini-node">Ticket submitted</div><span class="mini-arrow">→</span>
+          <div class="mini-node">AI categorizes</div><span class="mini-arrow">→</span>
+          <div class="mini-node">Priority routed</div>
+        </div>
+        <div class="case-actions">
+          <button class="case-toggle" data-target="case-support">View case study ↓</button>
+          <a href="https://www.loom.com/share/134662242e75435fa3a8812f24ce18bf" target="_blank" class="case-toggle">Watch 2 min demo ↗</a>
+        </div>
+        <div class="case-study" id="case-support">
+          <div class="case-grid">
+            <div><div class="case-label">THE PROBLEM</div><p class="case-copy">Support requests often need manual reading and sorting before they reach the right person or queue.</p></div>
+            <div><div class="case-label">THE SOLUTION</div><p class="case-copy">AI reads the incoming request, assigns category and urgency, then conditional logic routes it accordingly.</p></div>
+            <div><div class="case-label">WHAT I BUILT</div><p class="case-copy">AI classification, structured outputs and conditional routing logic inside an n8n workflow.</p></div>
+          </div>
+          <div class="case-flow-full">INCOMING TICKET → AI CLASSIFICATION → CATEGORY + URGENCY → CONDITIONAL ROUTING → LOGGED / ESCALATED</div>
+          <a href="https://www.loom.com/share/134662242e75435fa3a8812f24ce18bf" target="_blank" class="btn btn-ghost">Watch the full demo ↗</a>
+          <p class="case-note">Portfolio demonstration. Production routing should include confidence thresholds, fallback handling and the client's existing support tools.</p>
+        </div>
+      </article>
+    </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="process">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">How I work</div>
+      <h2>From repetitive process to working system.</h2>
+      <p class="section-desc">Every project starts with the actual business process, not the technology.</p>
+    </div>
+    <div class="process-grid">
+      <div class="process-step reveal"><div class="process-no">01 / AUDIT</div><div class="process-title">Map the process</div><p class="process-desc">We identify what happens now, where information moves and which steps are genuinely worth automating.</p></div>
+      <div class="process-step reveal"><div class="process-no">02 / DESIGN</div><div class="process-title">Plan the workflow</div><p class="process-desc">I map triggers, integrations, logic, edge cases and the tools involved before building.</p></div>
+      <div class="process-step reveal"><div class="process-no">03 / BUILD + TEST</div><div class="process-title">Make it work</div><p class="process-desc">The workflow is built and tested with realistic scenarios so the logic can be checked before launch.</p></div>
+      <div class="process-step reveal"><div class="process-no">04 / LAUNCH</div><div class="process-title">Deploy and hand over</div><p class="process-desc">The final setup is connected to the client's tools, with clear ownership of any ongoing software or API costs.</p></div>
+    </div>
+    <div class="pricing-note reveal"><strong>Project pricing:</strong> I quote based on workflow complexity, integrations and testing requirements. Smaller builds can start with a focused automation, while larger multi-step systems are scoped individually.</div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">Background</div>
+      <h2>Built to ship, not just demo.</h2>
+    </div>
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <p>I'm a developer and automation builder focused on turning repetitive business processes into practical workflows. Before focusing on automation, I built and shipped <strong>two full-stack web applications</strong> for a real estate client, including admin panels, review systems and production deployments.</p>
+        <p>That development background helps me think beyond the workflow canvas: how data enters a system, where it needs to go and how different tools should communicate.</p>
+        <p>I now build <strong>AI-powered automation systems</strong> for businesses that want to spend less time on repetitive operations and more time on work that actually needs a human.</p>
+      </div>
+      <div class="stack-list reveal">
+        <div class="stack-row"><span>Automation</span><span>n8n, Webhooks, REST APIs</span></div>
+        <div class="stack-row"><span>AI Integration</span><span>Groq, OpenAI-compatible APIs</span></div>
+        <div class="stack-row"><span>Web Development</span><span>React, Vite, Express, GSAP</span></div>
+        <div class="stack-row"><span>Data &amp; Ops</span><span>Google Sheets, Gmail, CRM logic</span></div>
+        <div class="stack-row"><span>Deployment</span><span>Railway, Google Cloud</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap">
+    <div class="contact-inner reveal">
+      <h2>Have a process you hate doing manually?</h2>
+      <p>Tell me what the process looks like now. I'll take a look and tell you whether it can realistically be automated.</p>
+      <form class="audit-form" action="https://formsubmit.co/zaynabimran.06@gmail.com" method="POST">
+        <input type="hidden" name="_subject" value="New Automation Audit Request">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_next" value="https://zainabimran9.github.io/portfolio/#contact">
+
+        <input type="text" name="Name" placeholder="Your name" required>
+        <input type="email" name="Email" placeholder="Your email" required>
+        <input class="full" type="text" name="Business" placeholder="Business or website">
+
+        <select name="Automation needed" required>
+          <option value="" disabled selected>What would you like to automate?</option>
+          <option>Lead follow-up</option>
+          <option>Business operations</option>
+          <option>AI-powered workflow</option>
+          <option>Something else</option>
+        </select>
+
+        <input type="text" name="Current tools" placeholder="Tools you currently use (optional)">
+        <textarea name="Current process or bottleneck" placeholder="What's the repetitive process or biggest bottleneck?" required></textarea>
+
+        <button type="submit" class="btn btn-solid full">Request a free automation audit →</button>
+      </form>
+      <div class="contact-links" style="margin-top:22px;">
+        <a href="mailto:zaynabimran.06@gmail.com?subject=Automation%20project" class="btn btn-ghost">Or email me directly</a>
+        <a href="https://github.com/zainabimran9" class="btn btn-ghost" target="_blank">GitHub ↗</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© Zainab Imran</span>
+    <span class="mono">Remote • Available for freelance projects</span>
+  </div>
+</footer>
+
+<script>
+  // ambient glow follows cursor
+  const glowField = document.getElementById('glowField');
+  window.addEventListener('mousemove', (e) => {
+    const x = (e.clientX / window.innerWidth) * 100;
+    const y = (e.clientY / window.innerHeight) * 100;
+    glowField.style.setProperty('--mx', x + '%');
+    glowField.style.setProperty('--my', y + '%');
+  });
+
+  // scroll reveal
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  revealEls.forEach(el => io.observe(el));
+
+  // interactive flow run
+  const runBtn = document.getElementById('runBtn');
+  const runBtnText = document.getElementById('runBtnText');
+  const flowOut = document.getElementById('flowOut');
+  const nodes = document.querySelectorAll('.node-dot');
+  const conns = document.querySelectorAll('.connector');
+  let running = false;
+
+  const messages = [
+    'Trigger fired — new request received…',
+    'AI reasoning step evaluating input…',
+    'Decision logic branching the flow…',
+    '<span class="ok">✓ Action complete — system updated.</span>'
+  ];
+
+  function resetFlow(){
+    nodes.forEach(n => n.classList.remove('lit'));
+    conns.forEach(c => c.classList.remove('active'));
+  }
+
+  runBtn.addEventListener('click', () => {
+    if (running) return;
+    running = true;
+    resetFlow();
+    runBtn.classList.add('running');
+    runBtnText.textContent = 'Running…';
+    flowOut.innerHTML = 'Initializing…';
+
+    let step = 0;
+    function nextStep(){
+      if (step > 0 && (step-1) < conns.length) {
+        conns[step-1].classList.remove('active');
+        void conns[step-1].offsetWidth;
+      }
+      if (step < nodes.length) {
+        nodes[step].classList.add('lit');
+        flowOut.innerHTML = messages[step];
+      }
+      if (step < conns.length) {
+        conns[step].classList.add('active');
+      }
+      step++;
+      if (step <= nodes.length) {
+        setTimeout(nextStep, 750);
+      } else {
+        running = false;
+        runBtn.classList.remove('running');
+        runBtnText.textContent = '▶ Run it again';
+      }
+    }
+    nextStep();
+  });
+
+  // case study toggles
+  document.querySelectorAll('.case-toggle[data-target]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.target);
+      const opening = !target.classList.contains('open');
+      target.classList.toggle('open');
+      btn.textContent = opening ? 'Hide case study ↑' : 'View case study ↓';
+    });
+  });
+
+</script>
+
+</body>
+</html>
